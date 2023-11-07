@@ -1,52 +1,75 @@
-name: Urlwatch
+name: urlwatch
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - develop
   schedule:
-    - cron: '0 */2 * * *'
+    - cron: '0 1 * * *'
+    - cron: '0 5 * * *'
+  workflow_dispatch:
 
 jobs:
-  deploy:
-    runs-on: ubuntu-latest
+  build:
+    runs-on: ubuntu-22.04
     permissions: 
       id-token: write
       contents: read
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-    - name: Fetch secrets from AKeyless
-      id: fetch-secrets
-      uses: LanceMcCarthy/akeyless-action@v3
-      with:
-        access-id: ${{ secrets.AKEYLESS_ACCESS_ID }}
-        static-secrets: |
+      - name: Fetch secrets from AKeyless
+        id: fetch-secrets
+        uses: LanceMcCarthy/akeyless-action@v3
+        with:
+          access-id: ${{ secrets.AKEYLESS_ACCESS_ID }}
+          static-secrets: |
+            {
+              "/alleaffengaffen/actions/totifications/telegram_token":"TELEGRAM_TOKEN",
+              "/alleaffengaffen/actions/totifications/chat_id":"CHAT_ID"
+            }
+      - name: Setup go-template-cli
+        run: |
+          curl -fsSL -o /tmp/tpl https://github.com/bluebrown/go-template-cli/releases/latest/download/tpl-linux-amd64
+          sudo install -m 555 /tmp/tpl /usr/local/bin/tpl
+          tpl --version
+      - uses: actions/checkout@v4
+      - name: Set up Python 3.x
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.12'
+      - name: Cache pip
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+            ${{ runner.os }}-
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip wheel
+          pip install pyyaml minidb requests keyring appdirs lxml cssselect html2text urlwatch
+      - name: Download cached db
+        continue-on-error: true
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          workflow: main.yml
+          workflow_conclusion: completed
+          branch: master
+          name: cachedb
+      - name: Template configs
+        run: |
+          cat <<EOF | tpl -f urlwatch.yaml > rendered-urlwatch.yaml
           {
-            "/alleaffengaffen/actions/totifications/telegram_token":"TELEGRAM_TOKEN",
-            "/alleaffengaffen/actions/totifications/chat_id":"CHAT_ID"
+            "telegram_token": "${{ env.TELEGRAM_TOKEN }}",
+            "chat_id": "${{ env.CHAT_ID }}"
           }
-    - name: Setup go-template-cli
-      run: |
-        curl -fsSL -o /tmp/tpl https://github.com/bluebrown/go-template-cli/releases/latest/download/tpl-linux-amd64
-        sudo install -m 555 /tmp/tpl /usr/local/bin/tpl
-        tpl --version
-    - name: Setup Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: 3.12
-    - name: Cache dependencies
-      uses: actions/cache@v3
-      with:
-        path: ${{ env.pythonLocation }}
-        key: ${{ env.pythonLocation }}-${{ hashFiles('requirements.txt') }}
-    - name: Install pip dependencies
-      run: pip install --upgrade --upgrade-strategy eager -r requirements.txt 
-    - name: Template configs
-      run: |
-        cat <<EOF | tpl -f urlwatch.yaml > rendered-urlwatch.yaml
-        {
-          "telegram_token": "${{ env.TELEGRAM_TOKEN }}",
-          "chat_id": "${{ env.CHAT_ID }}"
-        }
-        EOF
-    - name: Run urlwatch
-      run: urlwatch --urls urls.yaml --config rendered-urlwatch.yaml
+          EOF
+      - name: Run urlwatch
+        run: |
+          urlwatch --config=rendered-urlwatch.yaml --urls=urls.yaml --cache=cache.db
+      - name: Upload updated db
+        uses: actions/upload-artifact@v2
+        with:
+          name: cachedb
+          path: cache.db
+          retention-days: 1
