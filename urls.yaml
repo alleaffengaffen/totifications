@@ -1,0 +1,7 @@
+---
+name: "Go blog"
+url: "https://go.dev/blog/feed.atom?format=xml"
+filter:
+  - xpath: "//channel/item[1]/title"
+  - html2text: re
+  - strip:

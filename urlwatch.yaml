@@ -1,12 +1,18 @@
 display:
   empty-diff: true
-  error: true
+  error: false
   new: true
   unchanged: false
+job_defaults:
+  all: {}
+  url: {}
+  browser: {}
+  shell: {}
 report:
   telegram:
     bot_token: {{.telegram_token}}
-    chat_id: {{.chat_id}}
+    chat_id:
+      - "{{.chat_id}}"
     enabled: true
     monospace: false
     silent: true
