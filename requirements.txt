@@ -1,0 +1,9 @@
+pyyaml
+minidb
+requests
+keyring
+appdirs
+lxml
+cssselect
+html2text
+urlwatch
