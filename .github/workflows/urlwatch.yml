@@ -1,0 +1,52 @@
+name: Urlwatch
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 */2 * * *'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions: 
+      id-token: write
+      contents: read
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    - name: Fetch secrets from AKeyless
+      id: fetch-secrets
+      uses: LanceMcCarthy/akeyless-action@v3
+      with:
+        access-id: ${{ secrets.AKEYLESS_ACCESS_ID }}
+        static-secrets: |
+          {
+            "/alleaffengaffen/actions/totifications/telegram_token":"TELEGRAM_TOKEN",
+            "/alleaffengaffen/actions/totifications/chat_id":"CHAT_ID"
+          }
+    - name: Setup go-template-cli
+      run: |
+        curl -fsSL -o /tmp/tpl https://github.com/bluebrown/go-template-cli/releases/latest/download/tpl-linux-amd64
+        sudo install -m 555 /tmp/tpl /usr/local/bin/tpl
+        tpl --version
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.12
+    - name: Cache dependencies
+      uses: actions/cache@v3
+      with:
+        path: ${{ env.pythonLocation }}
+        key: ${{ env.pythonLocation }}-${{ hashFiles('requirements.txt') }}
+    - name: Install pip dependencies
+      run: pip install --upgrade --upgrade-strategy eager -r requirements.txt 
+    - name: Template configs
+      run: |
+        cat <<EOF | tpl -f urlwatch.yaml > rendered-urlwatch.yaml
+        {
+          "telegram_token": "${{ env.TELEGRAM_TOKEN }}",
+          "chat_id": "${{ env.CHAT_ID }}",
+        }
+        EOF
+    - name: Run urlwatch
+      run: urlwatch --urls urls.yaml --config rendered-urlwatch.yaml
