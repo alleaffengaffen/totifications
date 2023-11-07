@@ -1,11 +1,10 @@
 name: urlwatch
-
 on:
   push:
     branches:
       - develop
   schedule:
-    - cron: '0 */1 * * *'
+    - cron: '0 6-22/1 * * *'
   workflow_dispatch:
 
 jobs:
@@ -15,6 +14,10 @@ jobs:
       id-token: write
       contents: read
     steps:
+      - name: Setup timzone
+        uses: zcong1993/setup-timezone@v2.0.0
+        with:
+          timezone: Europe/Zurich
       - name: Fetch secrets from AKeyless
         id: fetch-secrets
         uses: LanceMcCarthy/akeyless-action@v3
