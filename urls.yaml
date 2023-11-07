@@ -1,4 +1,55 @@
 ---
+name: "Go blog"
+url: "https://go.dev/blog/feed.atom?format=xml"
+filter:
+  # always check if the most recent article is still the same, otherwise there must be a new one published
+  - xpath: "//entry[1]/link/@href"
+  - strip:
+---
+name: "Cyclingabout"
+url: "https://www.cyclingabout.com/feed/"
+filter:
+  - xpath: "//channel/item[1]/guid"
+  - html2text:
+---
+name: "ArchLinux News"
+url: "https://archlinux.org/feeds/news/"
+filter:
+  - xpath: "//channel/item[1]/text()"
+  - html2text:
+---
+name: "/e/ OS News"
+url: "https://e.foundation/feed/"
+filter:
+  - xpath: "//channel/item[1]/guid"
+  - html2text:
+---
+name: "Vitobotta Blog"
+url: "https://vitobotta.com/feed.xml"
+filter:
+  - xpath: "//channel/item[1]/guid"
+  - html2text:
+---
+name: "Schroeffu's Blog"
+url: "https://schroeffu.ch/feed/"
+filter:
+  - xpath: "//channel/item[1]/guid"
+  - html2text:
+---
+name: "Michael Stapelberg's Blog"
+url: "https://michael.stapelberg.ch/posts/"
+filter:
+  - element-by-class: ArticleList
+  - xpath: "//ul[1]/li/div/a/@href"
+  - strip:
+---
+name: "Argo CD Blog"
+url: "https://blog.argoproj.io/feed"
+filter:
+  - xpath: "//channel/item[1]/guid"
+  - html2text:
+  - strip:
+---
 name: "Cilium Newsletter"
 url: "https://cilium.io/newsletter/rss.xml"
 filter:
@@ -27,10 +78,3 @@ filter:
       path: //*[@class="Link--primary Link"]
       maxitems: 1
   - html2text:
----
-name: "Go blog"
-url: "https://go.dev/blog/feed.atom?format=xml"
-filter:
-  # always check if the most recent article is still the same, otherwise there must be a new one published
-  - xpath: "//entry[1]/link/@href"
-  - strip:
