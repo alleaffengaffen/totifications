@@ -1,8 +1,8 @@
 display:
-  empty-diff: true
-  error: false
-  new: true
+  empty-diff: false
   unchanged: false
+  error: true
+  new: true
 job_defaults:
   all: {}
   url: {}
@@ -14,5 +14,5 @@ report:
     chat_id:
       - "{{.chat_id}}"
     enabled: true
-    monospace: false
+    monospace: true
     silent: true

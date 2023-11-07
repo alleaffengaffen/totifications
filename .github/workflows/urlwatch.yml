@@ -5,8 +5,7 @@ on:
     branches:
       - develop
   schedule:
-    - cron: '0 1 * * *'
-    - cron: '0 5 * * *'
+    - cron: '0 */1 * * *'
   workflow_dispatch:
 
 jobs:
@@ -28,7 +27,7 @@ jobs:
             }
       - name: Setup go-template-cli
         run: |
-          curl -fsSL -o /tmp/tpl https://github.com/bluebrown/go-template-cli/releases/latest/download/tpl-linux-amd64
+          curl -fsSL -o /tmp/tpl https://github.com/bluebrown/go-template-cli/releases/download/v0.2.0/tpl-linux-amd64
           sudo install -m 555 /tmp/tpl /usr/local/bin/tpl
           tpl --version
       - uses: actions/checkout@v4
@@ -72,4 +71,3 @@ jobs:
         with:
           name: cachedb
           path: cache.db
-          retention-days: 1
