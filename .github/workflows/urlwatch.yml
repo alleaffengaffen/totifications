@@ -45,7 +45,7 @@ jobs:
         cat <<EOF | tpl -f urlwatch.yaml > rendered-urlwatch.yaml
         {
           "telegram_token": "${{ env.TELEGRAM_TOKEN }}",
-          "chat_id": "${{ env.CHAT_ID }}",
+          "chat_id": "${{ env.CHAT_ID }}"
         }
         EOF
     - name: Run urlwatch
