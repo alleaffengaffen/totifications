@@ -71,7 +71,7 @@ jobs:
         run: |
           urlwatch --config=rendered-urlwatch.yaml --urls=urls.yaml --cache=cache.db
       - name: Upload updated db
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: cachedb
           path: cache.db
