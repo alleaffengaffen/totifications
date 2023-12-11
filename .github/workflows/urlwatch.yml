@@ -48,7 +48,8 @@ jobs:
             ${{ runner.os }}-
       - name: Install dependencies
         run: |
-          pip install --upgrade pip wheel
+          python -m pip install --upgrade pip wheel
+          pip install pyyaml minidb requests keyring appdirs lxml cssselect html2text urlwatch
           pip install -r requirements.txt
       - name: Download cached db
         continue-on-error: true
@@ -56,6 +57,7 @@ jobs:
         with:
           workflow: urlwatch.yml
           workflow_conclusion: completed
+          branch: develop
           name: cachedb
       - name: Template configs
         run: |
@@ -73,3 +75,4 @@ jobs:
         with:
           name: cachedb
           path: cache.db
+          retention-days: 1
