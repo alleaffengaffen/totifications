@@ -9,5 +9,4 @@ html2text
 urlwatch
 jq
 playwright
-pdftotext
 beautifulsoup4 
