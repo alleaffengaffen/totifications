@@ -3,8 +3,8 @@ on:
   push:
     branches:
       - develop
-  schedule:
-    - cron: '0 6-22/1 * * *'
+  #schedule:
+    #- cron: '0 6-22/1 * * *'
   workflow_dispatch:
 
 jobs:
