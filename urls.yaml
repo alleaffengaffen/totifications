@@ -78,3 +78,31 @@ filter:
       path: //*[@class="Link--primary Link"]
       maxitems: 1
   - html2text:
+---
+name: "Martin Heinz's Blog" 
+url: https://martinheinz.dev/rss/
+filter:
+  - xpath: //channel/item[1]/guid
+  - html2text:
+  - strip:  
+---
+name: "Robusta Blog"
+url: https://home.robusta.dev/blog/rss.xml
+filter:
+  - xpath: //channel/item[1]/guid
+  - html2text:
+  - strip:
+---
+name: "Casey Callendrello's Blog"
+url: https://www.caseyc.net/home/index.xml
+filter:
+  - xpath: //channel/item[1]/guid
+  - html2text:
+  - strip:
+---
+name: "Jacob Tomlinson's Blog"
+url: https://jacobtomlinson.dev/posts/feed.xml
+filter:
+  - xpath: //channel/item[1]/guid
+  - html2text:
+  - strip:
