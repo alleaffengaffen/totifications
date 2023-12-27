@@ -3,12 +3,17 @@ on:
   push:
     branches:
       - develop
-  #schedule:
-    #- cron: '0 6-22/1 * * *'
+  schedule:
+    - cron: '0 6-22/1 * * *'
   workflow_dispatch:
 
+
+env:
+  STATE_BUCKET: "totifications"
+  STATE_BUCKET_REGION: "eu-west-1" 
+
 jobs:
-  build:
+  run:
     runs-on: ubuntu-22.04
     permissions: 
       id-token: write
@@ -18,6 +23,12 @@ jobs:
         uses: zcong1993/setup-timezone@v2.0.0
         with:
           timezone: Europe/Zurich
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::141091412313:role/totifications
+          role-session-name: totifications
+          aws-region: ${{ env.STATE_BUCKET_REGION }}
       - name: Fetch secrets from AKeyless
         id: fetch-secrets
         uses: LanceMcCarthy/akeyless-action@v3
@@ -49,17 +60,16 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip wheel
-          pip install pyyaml minidb requests keyring appdirs lxml cssselect html2text urlwatch
           pip install -r requirements.txt
-      - name: Download cached db
-        continue-on-error: true
-        uses: dawidd6/action-download-artifact@v3
+      - name: Grab cachedb from s3
+        uses: keithweaver/aws-s3-github-action@v1.0.0
+        if: always()
         with:
-          workflow: urlwatch.yml
-          workflow_conclusion: completed
-          branch: develop
-          name: cachedb
+          command: cp
+          source: s3://${{ env.STATE_BUCKET }}/cache.db
+          destination: cache.db
       - name: Template configs
+        if: always()
         run: |
           cat <<EOF | tpl -f urlwatch.yaml > rendered-urlwatch.yaml
           {
@@ -68,11 +78,14 @@ jobs:
           }
           EOF
       - name: Run urlwatch
+        if: always()
         run: |
+          sudo chown runner:docker cache.db
           urlwatch --config=rendered-urlwatch.yaml --urls=urls.yaml --cache=cache.db
-      - name: Upload updated db
-        uses: actions/upload-artifact@v4
+      - name: Put cachedb to s3
+        uses: keithweaver/aws-s3-github-action@v1.0.0
+        if: always()
         with:
-          name: cachedb
-          path: cache.db
-          retention-days: 1
+          command: cp
+          source: cache.db
+          destination: s3://${{ env.STATE_BUCKET }}/cache.db
