@@ -14,5 +14,5 @@ report:
     chat_id:
       - "{{.chat_id}}"
     enabled: true
-    monospace: true
+    #monospace: true
     silent: true
