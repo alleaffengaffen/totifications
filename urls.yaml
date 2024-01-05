@@ -1,5 +1,19 @@
 ---
-name: "Go blog"
+name: "eBPF Blog"
+url: https://ebpf.io/blog/rss.xml
+filter:
+  - xpath: //channel/item[1]/text()
+  - html2text:
+  - strip:
+---
+name: "AWS EKS News"
+url: https://aws.amazon.com/blogs/aws/category/compute/amazon-kubernetes-service/feed
+filter:
+  - xpath: //channel/item[1]/link
+  - html2text:
+  - strip:
+---
+name: "Go Blog"
 url: "https://go.dev/blog/feed.atom?format=xml"
 filter:
   # always check if the most recent article is still the same, otherwise there must be a new one published

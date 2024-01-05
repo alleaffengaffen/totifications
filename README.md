@@ -15,7 +15,7 @@ An instance of [urlwatch](https://urlwatch.readthedocs.io) that regurarly fetche
 You can locally run the following command to see if urlwatch produces the correct output:
 
 ```console
-urlwatch --config=rendered-urlwatch.yaml --urls=urls.yaml --test-filter 16
+urlwatch --config=rendered-urlwatch.yaml --urls=urls.yaml --test-filter 1
 ```
 
-Note: the `rendered-urlwatch.yaml` file must be generated the same way as the actions does it.
+Note: the `rendered-urlwatch.yaml` file must be templated by using the `urlwatch.yaml` file and a [go-template-cli](https://github.com/bluebrown/go-template-cli).
