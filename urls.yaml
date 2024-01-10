@@ -1,4 +1,11 @@
 ---
+name: "Proton Blog"
+url: https://proton.me/blog/feed
+filter:
+  - xpath: //channel/item[1]/guid
+  - html2text:
+  - strip:
+---
 name: "Infomaniak Blog"
 url: https://news.infomaniak.com/en/feed
 filter:
