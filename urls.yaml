@@ -1,4 +1,11 @@
 ---
+name: "Hetzner Blog"
+url: https://www.hetzner.com/news/rss.xml
+filter:
+  - xpath: //channel/item[1]/guid
+  - html2text:
+  - strip:
+---
 name: "Proton Blog"
 url: https://proton.me/blog/feed
 filter:
