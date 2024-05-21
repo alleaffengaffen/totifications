@@ -1,4 +1,11 @@
 ---
+name: "Github Feed"
+url: https://github.com/the-technat.private.atom?token=AGX6QSJWVHQ2CQ2N3CDZYHWELCRHQ
+filter: 
+  - xpath: //entry[1]/title
+  - html2text:
+  - strip:
+---
 name: "Dan Manners Blog"
 url: https://www.danmanners.com/posts/
 filter:
