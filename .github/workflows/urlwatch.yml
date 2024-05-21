@@ -4,18 +4,17 @@ on:
     branches:
       - develop
   schedule:
-    - cron: '0 6-22/4 * * 1-5'
+    - cron: "0 6-22/4 * * 1-5"
   workflow_dispatch:
-
 
 env:
   STATE_BUCKET: "gh-totifications"
-  STATE_BUCKET_REGION: "eu-west-1" 
+  STATE_BUCKET_REGION: "eu-west-1"
 
 jobs:
   run:
-    runs-on: ubuntu-22.04
-    permissions: 
+    runs-on: ubuntu-latest
+    permissions:
       id-token: write
       contents: read
     steps:
@@ -25,53 +24,35 @@ jobs:
           role-to-assume: arn:aws:iam::351425708426:role/gh-totifications
           role-session-name: totifications
           aws-region: ${{ env.STATE_BUCKET_REGION }}
-      - name: Fetch secrets from AKeyless
-        id: fetch-secrets
-        uses: LanceMcCarthy/akeyless-action@v3
-        with:
-          access-id: ${{ secrets.AKEYLESS_ACCESS_ID }}
-          static-secrets: |
-            {
-              "/actions/telegram_token":"TELEGRAM_TOKEN",
-              "/actions/chat_id":"CHAT_ID"
-            }
-      - name: Setup go-template-cli
+      - name: setup go-template-cli
         run: |
-          curl -fsSL -o /tmp/tpl https://github.com/bluebrown/go-template-cli/releases/download/v0.2.0/tpl-linux-amd64
+          curl -fsSL -o /tmp/tpl https://github.com/bluebrown/go-template-cli/releases/download/v0.3.1/tpl-linux-amd64
           sudo install -m 555 /tmp/tpl /usr/local/bin/tpl
           tpl --version
       - uses: actions/checkout@v4
       - name: Set up Python 3.x
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
-      # - name: Cache pip
-      #   uses: actions/cache@v3
-      #   with:
-      #     path: ~/.cache/pip
-      #     key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-pip-
-      #       ${{ runner.os }}-
-      - name: Install urlwatch & dependencies
+          python-version: "3.12"
+      - name: install urlwatch & dependencies
         run: |
           python -m pip install --upgrade pip wheel
           pip install -r requirements.txt
-      - name: Grab cachedb from s3
+      - name: grab cachedb from s3
         if: always()
         run: aws s3 cp s3://${{ env.STATE_BUCKET }}/cache.db cache.db
-      - name: Template configs
+      - name: template urlwatch config
         if: always()
         run: |
           cat <<EOF | tpl -f urlwatch.yaml > rendered-urlwatch.yaml
           {
-            "telegram_token": "${{ env.TELEGRAM_TOKEN }}",
-            "chat_id": "${{ env.CHAT_ID }}"
+            "telegram_token": "${{ secrets.TELEGRAM_TOKEN }}",
+            "chat_id": "${{ secrets.CHAT_ID }}"
           }
           EOF
-      - name: Run urlwatch
+      - name: run urlwatch
         if: always()
         run: urlwatch --config=rendered-urlwatch.yaml --urls=urls.yaml --cache=cache.db
-      - name: Put cachedb to s3
+      - name: upload new cachedb to s3
         if: always()
         run: aws s3 cp cache.db s3://${{ env.STATE_BUCKET }}/cache.db

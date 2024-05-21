@@ -1,4 +1,18 @@
 ---
+name: "Dan Manners Blog"
+url: https://www.danmanners.com/posts/
+filter:
+  - element-by-class: "content"
+  - xpath: "//section/ul/li[1]/a/@href"
+  - strip:
+---
+name: "Github Status"
+url: https://www.githubstatus.com/history.rss
+filter:
+  - xpath: //channel/item[1]/guid
+  - html2text:
+  - strip:
+---
 name: "Hetzner Blog"
 url: https://www.hetzner.com/news/rss.xml
 filter:
@@ -128,12 +142,12 @@ filter:
       maxitems: 1
   - html2text:
 ---
-name: "Martin Heinz's Blog" 
+name: "Martin Heinz's Blog"
 url: https://martinheinz.dev/rss/
 filter:
   - xpath: //channel/item[1]/guid
   - html2text:
-  - strip:  
+  - strip:
 ---
 name: "Robusta Blog"
 url: https://home.robusta.dev/blog/rss.xml
