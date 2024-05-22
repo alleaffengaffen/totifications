@@ -1,6 +1,6 @@
 ---
 name: "Github Feed"
-url: https://github.com/the-technat.private.atom?token=AGX6QSJWVHQ2CQ2N3CDZYHWELCRHQ
+url: https://github.com/the-technat.private.atom?token=XYZ
 filter: 
   - xpath: //entry[1]/title
   - html2text:
