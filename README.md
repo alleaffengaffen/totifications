@@ -1,3 +1,5 @@
+**Totifications has been replaced with SaaS (checkout [Reeder5](https://www.reederapp.com/) instead)**
+
 # Totifications
 
 An instance of [urlwatch](https://urlwatch.readthedocs.io) that regurarly fetches news for me.
